@@ -6,7 +6,7 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/01 08:58:18 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/01 09:44:42 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/03 09:46:42 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	main(int ac, char **av)
 	BitcoinExchange btc;
 
 	btc.loadDatabase();
-	
+	btc.processInput(av[1]);
 
 	return 0;
 }

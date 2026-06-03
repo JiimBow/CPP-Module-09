@@ -6,7 +6,7 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/01 08:58:26 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/01 09:45:04 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/03 09:54:03 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ public:
 
 	void loadDatabase();
 	void processInput(const std::string& filename);
+	bool isValidDate(const std::string &date) const;
 };
 
 
