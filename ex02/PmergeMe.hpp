@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 13:43:22 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/25 09:03:50 by jodone           ###   ########.fr       */
+/*   Updated: 2026/06/25 09:57:27 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ typedef struct Pair
 {
 	int first;
 	int second;
-};
+}	t_pair;
 
 class PmergeMe
 {
