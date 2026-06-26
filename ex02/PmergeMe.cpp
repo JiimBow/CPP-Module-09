@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PmergeMe.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
+/*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 13:43:33 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/25 10:05:44 by jodone           ###   ########.fr       */
+/*   Updated: 2026/06/26 11:54:31 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,52 +15,6 @@
 #include <string>
 #include <set>
 #include <algorithm>
-
-static std::vector<int> jacobsthal(int n)
-{
-	std::vector<int> j;
-	j.push_back(0);
-	j.push_back(1);
-
-	while (1)
-	{
-		int next = j[j.size() - 1] + 2 * j[j.size() - 2];
-		if (next > n)
-			break;
-		j.push_back(next);
-	}
-	return j;
-}
-
-static std::vector<int> insertionOrder(int size)
-{
-	std::vector<int> order;
-	std::vector<int> jac = jacobsthal(size);
-	std::vector<bool> used(size + 1, false);
-
-	for (size_t i = 1; i < jac.size(); i++)
-	{
-		int end = jac[i];
-		int start = jac[i - 1] + 1;
-
-		for (int j = end; j >= start; j--)
-		{
-			if (j <= size && !used[j])
-			{
-				order.push_back(j);
-				used[j] = true;
-			}
-		}
-	}
-
-	for (int i = size; i >= 1; i--)
-	{
-		if (!used[i])
-			order.push_back(i);
-	}
-
-	return order;
-}
 
 int PmergeMe::parse(int ac, char **av)
 {
@@ -84,6 +38,7 @@ int PmergeMe::parse(int ac, char **av)
 			return 1;
 		}
 		_vec.push_back(static_cast<int>(number));
+		_deq.push_back(static_cast<int>(number));
 	
 		std::set<int> unique(_vec.begin(), _vec.end());
 		if (unique.size() != _vec.size())
@@ -92,6 +47,8 @@ int PmergeMe::parse(int ac, char **av)
 			return 1;
 		}
 	}
+
+	std::cout << "Before: ";
 	for (size_t i = 0; i < _vec.size(); i++)
 	{
 		std::cout << _vec[i];
@@ -102,58 +59,231 @@ int PmergeMe::parse(int ac, char **av)
 	return 0;
 }
 
-void PmergeMe::sortVector()
-{
-	std::vector<Pair> pairs;
-	bool hasLast = false;
-	int last = 0;
 
-	for (size_t i = 0; i + 1 < _vec.size(); i += 2)
+// VECTOR
+
+static std::vector<int> jacobsthal(int n)
+{
+	std::vector<int> j;
+	j.push_back(1);
+	j.push_back(3);
+
+	while (1)
+	{
+		int next = j[j.size() - 1] + 2 * j[j.size() - 2];
+		if (next > n)
+			break;
+		j.push_back(next);
+	}
+	return j;
+}
+
+static std::vector<int> insertionOrder(int size)
+{
+	std::vector<int> order;
+	std::vector<int> jac = jacobsthal(size);
+	std::vector<bool> used(size, false);
+
+	int prev = 0;
+
+	for (size_t i = 0; i < jac.size(); i++)
+	{
+		int end = jac[i];
+		if (end > size)
+			end = size;
+
+		for (int j = end; j > prev; j--)
+		{
+			if (!used[j - 1])
+			{
+				order.push_back(j - 1);
+				used[j - 1] = true;
+			}
+		}
+		prev = end;
+	}
+
+	for (int i = size - 1; i >= 0; i--)
+	{
+		if (!used[i])
+			order.push_back(i);
+	}
+
+	return order;
+}
+
+std::vector<int>	PmergeMe::fordJohnson(std::vector<int> input)
+{
+	if (input.size() <= 1)
+		return input;
+	
+	std::vector<Pair> pairs;
+	for (size_t i = 0; i + 1 < input.size(); i += 2)
 	{
 		Pair p;
-
-		p.first = _vec[i];
-		p.second = _vec[i + 1];
-
+		if (input[i] < input[i + 1])
+		{
+			p.first = input[i];
+			p.second = input[i + 1];
+		}
+		else
+		{
+			p.first = input[i + 1];
+			p.second = input[i];
+		}
 		pairs.push_back(p);
 	}
-	if (_vec.size() % 2)
-	{
-		hasLast = true;
-		last = _vec.back();
-	}
-	for (size_t i = 0; i < pairs.size(); i++)
-	{
-		if (pairs[i].first > pairs[i].second)
-			std::swap(pairs[i].first, pairs[i].second);
-	}
 
-	std::vector<int> smalls;
 	std::vector<int> bigs;
 
 	for (size_t i = 0; i < pairs.size(); i++)
-	{
-		smalls.push_back(pairs[i].first);
 		bigs.push_back(pairs[i].second);
-	}
-	std::sort(bigs.begin(), bigs.end());
 	
-	std::vector<int> order = insertionOrder(smalls.size());
+	bigs = fordJohnson(bigs);
 
+	std::vector<int> result = bigs;
+
+	std::vector<int> smalls;
+	for (size_t i = 0; i < pairs.size(); i++)
+		smalls.push_back(pairs[i].first);
+
+	std::vector<int> order = insertionOrder(smalls.size());
 	for (size_t i = 0; i < order.size(); i++)
 	{
-		int value = smalls[order[i] - 1];
+		int value = smalls[order[i]];
 
-		std::vector<int>::iterator pos = std::lower_bound(bigs.begin(), bigs.end(), value);
-
-		bigs.insert(pos, value);
+		std::vector<int>::iterator pos = std::lower_bound(result.begin(), result.end(), value);
+		result.insert(pos, value);
 	}
 
-	for (size_t i = 0; i < bigs.size(); i++)
+	if (input.size() % 2 != 0)
 	{
-		std::cout << bigs[i];
-		if (i + 1 < bigs.size())
-			std::cout << " ";
+		int last = input.back();
+
+		std::vector<int>::iterator pos = std::lower_bound(result.begin(), result.end(), last);
+		result.insert(pos, last);
 	}
-	std::cout << std::endl;
+
+	return result;
+}
+
+
+// DEQUE
+
+static std::deque<int> jacobsthalDeque(int n)
+{
+	std::deque<int> j;
+	j.push_back(1);
+	j.push_back(3);
+
+	while (1)
+	{
+		int next = j[j.size() - 1] + 2 * j[j.size() - 2];
+		if (next > n)
+			break;
+		j.push_back(next);
+	}
+	return j;
+}
+
+static std::deque<int> insertionOrderDeque(int size)
+{
+	std::deque<int> order;
+	std::deque<int> jac = jacobsthalDeque(size);
+	std::vector<bool> used(size, false);
+
+	int prev = 0;
+
+	for (size_t i = 0; i < jac.size(); i++)
+	{
+		int end = jac[i];
+		if (end > size)
+			end = size;
+
+		for (int j = end; j > prev; j--)
+		{
+			if (!used[j - 1])
+			{
+				order.push_back(j - 1);
+				used[j - 1] = true;
+			}
+		}
+		prev = end;
+	}
+
+	for (int i = size - 1; i >= 0; i--)
+	{
+		if (!used[i])
+			order.push_back(i);
+	}
+
+	return order;
+}
+
+std::deque<int>	PmergeMe::fordJohnson(std::deque<int> input)
+{
+	if (input.size() <= 1)
+		return input;
+	
+	std::deque<Pair> pairs;
+	for (size_t i = 0; i + 1 < input.size(); i += 2)
+	{
+		Pair p;
+		if (input[i] < input[i + 1])
+		{
+			p.first = input[i];
+			p.second = input[i + 1];
+		}
+		else
+		{
+			p.first = input[i + 1];
+			p.second = input[i];
+		}
+		pairs.push_back(p);
+	}
+
+	std::deque<int> bigs;
+
+	for (size_t i = 0; i < pairs.size(); i++)
+		bigs.push_back(pairs[i].second);
+	
+	bigs = fordJohnson(bigs);
+
+	std::deque<int> result = bigs;
+
+	std::deque<int> smalls;
+	for (size_t i = 0; i < pairs.size(); i++)
+		smalls.push_back(pairs[i].first);
+
+	std::deque<int> order = insertionOrderDeque(smalls.size());
+	for (size_t i = 0; i < order.size(); i++)
+	{
+		int value = smalls[order[i]];
+
+		std::deque<int>::iterator pos = std::lower_bound(result.begin(), result.end(), value);
+		result.insert(pos, value);
+	}
+
+	if (input.size() % 2 != 0)
+	{
+		int last = input.back();
+
+		std::deque<int>::iterator pos = std::lower_bound(result.begin(), result.end(), last);
+		result.insert(pos, last);
+	}
+
+	return result;
+}
+
+
+// GETTER
+
+const std::vector<int>& PmergeMe::getVec() const
+{
+	return _vec;
+}
+
+const std::deque<int>& PmergeMe::getDeq() const
+{
+	return _deq;
 }
