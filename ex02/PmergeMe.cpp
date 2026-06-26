@@ -6,7 +6,7 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 13:43:33 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/26 11:54:31 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/26 19:13:42 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,17 +143,16 @@ std::vector<int>	PmergeMe::fordJohnson(std::vector<int> input)
 
 	std::vector<int> result = bigs;
 
-	std::vector<int> smalls;
-	for (size_t i = 0; i < pairs.size(); i++)
-		smalls.push_back(pairs[i].first);
-
-	std::vector<int> order = insertionOrder(smalls.size());
+	std::vector<int> order = insertionOrder(pairs.size());
 	for (size_t i = 0; i < order.size(); i++)
 	{
-		int value = smalls[order[i]];
+		Pair& p = pairs[order[i]];
 
-		std::vector<int>::iterator pos = std::lower_bound(result.begin(), result.end(), value);
-		result.insert(pos, value);
+		std::vector<int>::iterator partner = std::find(result.begin(), result.end(), p.second);
+
+		std::vector<int>::iterator pos = std::lower_bound(result.begin(), partner, p.first);
+
+		result.insert(pos, p.first);
 	}
 
 	if (input.size() % 2 != 0)
@@ -251,17 +250,16 @@ std::deque<int>	PmergeMe::fordJohnson(std::deque<int> input)
 
 	std::deque<int> result = bigs;
 
-	std::deque<int> smalls;
-	for (size_t i = 0; i < pairs.size(); i++)
-		smalls.push_back(pairs[i].first);
-
-	std::deque<int> order = insertionOrderDeque(smalls.size());
+	std::deque<int> order = insertionOrderDeque(pairs.size());
 	for (size_t i = 0; i < order.size(); i++)
 	{
-		int value = smalls[order[i]];
+		Pair& p = pairs[order[i]];
 
-		std::deque<int>::iterator pos = std::lower_bound(result.begin(), result.end(), value);
-		result.insert(pos, value);
+		std::deque<int>::iterator partner = std::find(result.begin(), result.end(), p.second);
+
+		std::deque<int>::iterator pos = std::lower_bound(result.begin(), partner, p.first);
+
+		result.insert(pos, p.first);
 	}
 
 	if (input.size() % 2 != 0)
