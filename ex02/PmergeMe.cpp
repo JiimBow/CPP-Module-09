@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PmergeMe.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 13:43:33 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/26 19:13:42 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/07/01 14:04:22 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,15 @@ int PmergeMe::parse(int ac, char **av)
 			std::cerr << "Error: argument too long" << std::endl;
 			return 1;
 		}
-		long number = std::strtol(av[i], NULL, 10);
+		char *errptr;
+		long number = std::strtol(av[i], &errptr, 10);
+	
+		if (*errptr != '\0')
+		{
+			std::cerr << "Error: You must give positives int as arguments" << std::endl;
+			return 1;
+		}
+
 		if (number < 0)
 		{
 			std::cerr << "Error: You must give positives int as arguments" << std::endl;
